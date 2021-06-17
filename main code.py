@@ -156,10 +156,6 @@ def P_train(BATCH_SIZE, v, n):
                 sns.heatmap(ax=ax[1], data=real, linewidths=0.5, vmin=500, vmax=10000, cmap=colormap)
                 ax[1].set_title('Real')
 
-                fig.savefig(
-                    f'./{location}/{n}sig/train_save_png_npy/P/fake_vs_real/ver{str(v)}_epoch{str(ee)}.png')
-                # fig.show()
-
                 fake = fake.reshape(3, 3, 1)
                 real = real.reshape(3, 3, 1)
 
@@ -168,7 +164,6 @@ def P_train(BATCH_SIZE, v, n):
                 fake = fake.reshape(1, 3, 3, 1)
 
                 R_F_rmse = np.sqrt(mean_squared_error(real.reshape(-1, 1), fake.reshape(-1, 1)))
-                # print(R_F_rmse)
                 losses.append((d_loss, g_loss))
                 rmse.append(R_F_rmse)
 
@@ -184,9 +179,6 @@ def GAN_plot(losses, rmse, v, ty, n):
     ax[0].legend()
     ax[1].plot(rmse, label='Rmse')
     ax[1].legend()
-    print(f'v_{str(v)}', np.min(rmse), np.max(rmse), np.mean(rmse))
-    fig.savefig(f'./{location}/{n}sig/train_save_png_npy/{ty}_v{str(v)}.png')
-
     fig.show()
     return rmse[-1]
 
@@ -236,13 +228,6 @@ def PN_GAN_predict(lon, lat, n):
         result.to_csv(f'./{location}/result_{year}_{n}sig.csv', index=False, encoding='utf-8-sig')
         # 有了result檔 每個column是每個模型的預測結果
 
-
-def Distance(x, y):
-    # print(y-x)
-    # return sum(sum((y - x)))[0]
-    return np.min(y - x)
-
-
 def anomaly_score(lon, lat, n, BATCH_SIZE):
     lon = str('%.03f' % lon)
     lat = str('%.03f' % lat)
@@ -274,10 +259,6 @@ def anomaly_score(lon, lat, n, BATCH_SIZE):
                 g_P_anomaly_score.append(P_score)
             result_score[f'P_v{str(v)}'] = g_P_anomaly_score
 
-        result_score['TIME'] = gr_test['TIME']
-        result_score['POPULATION'] = gr_test['POPULATION']
-        result_score.to_csv(f'./{location}/result_score_{year}_{n}sig.csv', index=False, encoding='utf-8-sig')
-
 
 def second_model(lon, lat, n):
     delta = 0.005
@@ -294,23 +275,6 @@ def second_model(lon, lat, n):
     left_center, center, right_center = f'{left}_{lat}', f'{lon}_{lat}', f'{right}_{lat}'
     left_down, down, right_down = f'{left}_{down}', f'{lon}_{down}', f'{right}_{down}'
 
-    train_threshold = pd.read_csv(f'./{location}/{n}sig/threshold_{str(center)}.csv')
-    gr_test1 = pd.read_csv(f'./grid_data_test/{left_top}.csv')
-    gr_test2 = pd.read_csv(f'./grid_data_test/{top}.csv')
-    gr_test3 = pd.read_csv(f'./grid_data_test/{right_top}.csv')
-    gr_test4 = pd.read_csv(f'./grid_data_test/{left_center}.csv')
-    gr_test5 = pd.read_csv(f'./grid_data_test/{center}.csv')
-    gr_test6 = pd.read_csv(f'./grid_data_test/{right_center}.csv')
-    gr_test7 = pd.read_csv(f'./grid_data_test/{left_down}.csv')
-    gr_test8 = pd.read_csv(f'./grid_data_test/{down}.csv')
-    gr_test9 = pd.read_csv(f'./grid_data_test/{right_down}.csv')
-
-    train_X = pd.read_csv(f'./{location}/result_train_{n}sig.csv').iloc[:, :-2]
-    test_X = pd.read_csv(f'./{location}/result_test_{n}sig.csv').iloc[:, :-2]
-    print(train_X)
-    Emsem_result = pd.DataFrame()
-    train_y = pd.read_csv(f'./{location}/train_target/{n}sig/all.csv')['Sum']
-    test_y = pd.read_csv(f'./{location}/test_target/{n}sig/all.csv')['Sum']
 
     model = RandomForestClassifier(n_estimators=500)
     model.fit(train_X, train_y)
@@ -321,30 +285,3 @@ def second_model(lon, lat, n):
     print('f1_score:', f1_score(test_y, y_pred))
     print('recall', recall_score(test_y, y_pred))
 
-    Emsem_result['TIME'] = gr_test1['TIME']
-    Emsem_result['left_top_POP'] = gr_test1['POPULATION']
-    Emsem_result['top_POP'] = gr_test2['POPULATION']
-    Emsem_result['right_top_POP'] = gr_test3['POPULATION']
-    Emsem_result['left_POP'] = gr_test4['POPULATION']
-    Emsem_result['center_POP'] = gr_test5['POPULATION']
-    Emsem_result['right_POP'] = gr_test6['POPULATION']
-    Emsem_result['left_down_POP'] = gr_test7['POPULATION']
-    Emsem_result['down_POP'] = gr_test8['POPULATION']
-    Emsem_result['right_down_POP'] = gr_test9['POPULATION']
-    Emsem_result['predict_y'] = y_pred
-    Emsem_result['test_y'] = test_y
-    Emsem_result['location'] = train_threshold['location']
-    Emsem_result['threshold'] = train_threshold['threshold']
-    col_list = list(Emsem_result.columns)
-    for i in range(9):
-        th = Emsem_result.at[i, 'threshold']
-        loca = Emsem_result.at[i, 'location']
-        Emsem_result[f'{loca}_target'] = Emsem_result[col_list[i + 1]].apply(lambda x: 0 if x <= th else 1)
-    Emsem_result.to_csv(f'./{location}/{n}sig/result_emsemble.csv', index=False, encoding='utf-8-sig')
-
-
-def anomaly_model(lon, lat, n):
-    PN_GAN_train(n)
-    PN_GAN_predict(lon, lat, n)
-    anomaly_score(lon, lat, n, batchsize)
-    second_model(lon, lat, n)
