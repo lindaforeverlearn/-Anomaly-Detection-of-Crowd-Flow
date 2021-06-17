@@ -8,7 +8,7 @@ from interval import Interval
 # import missingno as msno
 from scipy import interpolate
 
-location = 'Chungsiou'  # Shilin ZhongShan Taipei101 Gonggran
+location = 'Taipei101' 
 
 
 # -------------- test -----------
@@ -31,18 +31,6 @@ def test_fakevsreal():
         sns.heatmap(ax=ax[1], data=real, linewidths=0.5, vmin=500, vmax=10000)
         ax[1].set_title('Real')
         plt.show()
-
-        # data = np.load(r'C:\Users\Linda\Desktop\Master\model\Code\People_GAN_pycharm\chungshan\GAN\npy\fake\1.npy')
-        # # print(data)
-        # ax = sns.heatmap(data[0], linewidths=0.5)
-        # plt.show()
-        # # 　[[[ 2333.  4407.  3775.]
-        # # [ 2446.  2254.  3844.]
-        # # [ 4955.  1274.  1696.]]
-        #
-        # ax = sns.heatmap(data[0], linewidths=0.5)
-        # plt.show()
-
 
 # test_fakevsreal()
 
@@ -86,15 +74,6 @@ def plot_choropleth(data):
     file_path = 'C:/Users/Linda/Desktop/Master/model/Code/People_GAN_pycharm.html'
     fmap.save(file_path)
 
-    # import selenium.webdriver
-    # driver = selenium.webdriver.Chrome(r'C:\Users\Linda\Desktop\linda_model\model\chromedriver')
-    # driver.set_window_size(1920, 1080)  # choose a resolution
-    # driver.get(file_path)
-    # # You may need to add time.sleep(seconds) here
-    # driver.save_screenshot('graph/101/'+year+'/png/1026heatmap_' + str(x) + '.png')
-    # driver.close()
-
-
 # plot_choropleth(data)
 
 
@@ -102,18 +81,16 @@ def plot_choropleth(data):
 
 def sigma(data, n):
     data = data.POPULATION.tolist()
-    # print(len(data))
 
-    ymean = np.mean(data)  # 求时间序列平均值
-    ystd = np.std(data)  # 求时间序列标准差
-    # down = ymean - n * ystd  # 计算下界
+    ymean = np.mean(data)  
+    ystd = np.std(data)  
+    # down = ymean - n * ystd  
     up = ymean + n * ystd
-    outlier = []  # 将异常值保存
+    outlier = []  
     index_list = []
 
     for i in range(0, len(data)):
         if data[i] > up:
-            # if (data[i] < down) | (data[i] > up):
             outlier.append(data[i])
             index_list.append(i)
         else:
@@ -152,12 +129,9 @@ def sigma_create_data(n, lon, lat):
 
         for index in index_list:
             gr.at[index, 'POPULATION'] = np.nan
-        # check_before = gr[gr.isnull().values is True]
-        # print(check_before)
+
         gr['POPULATION'] = gr['POPULATION'].interpolate(method='linear')
         gr['POPULATION'] = gr['POPULATION'].fillna(gr['POPULATION'].mean())
-        # check_after = gr[gr.isnull().values is True]
-        # print(check_after)
         gr.to_csv(f'./{location}/{n}sig/{str(grid)}_{n}sig.csv', index=False, encoding='utf-8-sig')
 
         for hr in range(8760):
@@ -172,56 +146,6 @@ def sigma_create_data(n, lon, lat):
     np.save(f'./{location}/save_z_{n}sig.npy', z)
 
 
-# threesigma_run_draw_output()
-
-# data_zhongsan_1 = pd.read_csv('./grid_data/121.515_25.055.csv')  # 121.515_25.055
-# data_zhongsan_2 = pd.read_csv('./grid_data/121.520_25.055.csv')  # 121.520_25.055
-# data_zhongsan_3 = pd.read_csv('./grid_data/121.525_25.055.csv')  # 121.525_25.055
-# data_zhongsan_4 = pd.read_csv('./grid_data/121.515_25.050.csv')  # 121.515_25.050
-# data_zhongsan_5 = pd.read_csv('./grid_data/121.520_25.050.csv')  # 121.520_25.050
-# data_zhongsan_6 = pd.read_csv('./grid_data/121.525_25.050.csv')  # 121.525_25.050
-# data_zhongsan_7 = pd.read_csv('./grid_data/121.515_25.045.csv')  # 121.515_25.045
-# data_zhongsan_8 = pd.read_csv('./grid_data/121.520_25.045.csv')  # 121.520_25.045
-# data_zhongsan_9 = pd.read_csv('./grid_data/121.525_25.045.csv')  # 121.525_25.045
-# grid_list = ['data_zhongsan_1', 'data_zhongsan_2', 'data_zhongsan_3', 'data_zhongsan_4', 'data_zhongsan_5',
-#              'data_zhongsan_6', 'data_zhongsan_7', 'data_zhongsan_8', 'data_zhongsan_9']
-# grid = 1
-# for gr in grid_list:
-#     gr = globals()[gr]
-#     print('#######################')
-#     print(gr)
-#     print('grid:', grid)
-#     outlier, index_list = threesigma(gr, n)
-#     print(index_list)
-#     print(len(outlier))  # 中山左上>>3:87/ 2:285/ 1:2601
-# print(len(index_list))
-# for index in index_list:
-#     gr.at[index, 'POPULATION'] = np.nan
-#     # gr.at[index, 'target'] = 1
-
-# print(gr)
-# df1_lack_only = gr[gr.isnull().values == True]
-# print(df1_lack_only)
-
-# msno.matrix(gr, figsize=(9, 20), fontsize=10)
-# plt.title('zhongsan' + str(grid) + ' 3-sig abnormal')
-# plt.savefig('zhongsan' + str(grid) + ' 3-sig abnormal_2.png')
-# plt.show()
-#
-# fig, ax = plt.subplots(2, figsize=(20, 7))
-# fig.suptitle('zhongsan' + str(grid) + ' 3-sig abnormal vs normal')
-# ax[0].plot(gr.POPULATION, label='abnormal')
-# gr['POPULATION'] = gr['POPULATION'].interpolate(method='linear')
-# ax[1].plot(gr['POPULATION'], label='normal')
-# ax[0].legend()
-# ax[1].legend()
-# plt.savefig('zhongsan' + str(grid) + ' 3-sig abnormal vs normal.png')
-# plt.show()
-#
-# gr.to_csv('zhongsan' + str(grid) + '_3sig.csv', index=False, encoding='utf-8-sig')
-# grid += 1
-
-# threesigma_run_draw_output()
 
 def save_z_last():
     gr1_csv = pd.read_csv('./zhongsan_3sig/zhongsan1_3sig.csv')
@@ -259,9 +183,6 @@ def save_z_last():
     np.save('save_z_zhongsan_3sig.npy', z)
 
 
-# -----------clean test_data2019-------------
-# df = pd.read_csv(r"原始資料\2019.csv")
-df = pd.read_csv(r'C:\Users\Linda\Desktop\Master\model\Code\Data\test_data\test_2019.csv')
 
 def find_latlon():
     # 找該點位是屬於人流資料中哪個網格
@@ -269,14 +190,9 @@ def find_latlon():
     lon_delta = 0.005 / 2
     latlon = list(df.columns.values)
     for i in latlon:
-        # print(i)
-        # text = df.at[i, 'lat_lon']
         if '_' in i:
             lon = i.split('_', 1)[0]
             lat = i.split('_', 1)[1]
-            # print(lon, lat)
-            # lon = df.at[i, 'Lon']
-            # lat = df.at[i, 'Lat']
             top = float(lon) + lon_delta
             down = float(lon) - lon_delta
             right = float(lat) + lat_delta
@@ -290,13 +206,10 @@ def find_latlon():
             lat_bol = lat_711 in zoom_lat
             if lon_bol == True and lat_bol == True:
                 print(i)
-
-
 # find_latlon()
 
 
 def test_data_2019():
-    # 產生全部Grid 2019 Data存在 ./grid_data_test
     df2019 = pd.read_csv('./test_2019.csv')
     print(df2019)
 
@@ -307,7 +220,6 @@ def test_data_2019():
         grid_data = pd.DataFrame()
         grid_data['TIME'] = df2019['Time']
         grid_data['POPULATION'] = df2019[col]
-        # print(grid_data)
         print(grid_data.isnull().any().sum())
         print(grid_data.isna().any().sum())
         grid_data.to_csv('./grid_data_test/' + col + '.csv', index=False, encoding='utf-8-sig')
@@ -453,20 +365,12 @@ def test_real():
 
 
 def main():
-
-    # lon, lat = 121.520, 25.090  # Shilin
-    # lon, lat = 121.520, 25.050  # zhongshan
-    # lon, lat = 121.565, 25.035  # Taipei101
-    # lon, lat = 121.460, 25.015  # Banqiao
-    # lon, lat = 121.535, 25.015  # Gonggran
-    lon, lat = 121.550, 25.040  # Chungsiou
+    lon, lat = 121.565, 25.035  # Taipei101
 
     for n in [1.5, 2, 3]:  # 1.5, 2, 2.5, 3, 3.5
-        # n = 3  # n*sigma  1.5 2 3
         sigma_create_data(n, lon, lat)
         save_z(lon, lat, 'train')  # 8760*3*3
         save_z(lon, lat, 'test')
         test_target(n, lon, lat)  # 8760*1
-
 
 main()
