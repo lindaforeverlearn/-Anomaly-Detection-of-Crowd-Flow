@@ -15,24 +15,17 @@ location = 'Taipei101'
 def test_fakevsreal():
     for epoch in range(30):  # 30
         print("Epoch is　：", epoch)
-
         fig, ax = plt.subplots(1, 2, figsize=(12, 6))
         fig.suptitle("Fake vs Real" + str(epoch))
-
         fake = np.load(f'./chungshan/GAN/npy/fake/{str(epoch)}.npy')
         fake = fake.reshape(3, 3)
         sns.heatmap(ax=ax[0], data=fake, linewidths=0.5, vmin=500, vmax=10000)
         ax[0].set_title('Fake')
-
         real = np.load(f'./chungshan/GAN/npy/real/{str(epoch)}.npy')
-        print(real.shape)
-        print(real[0].shape)
         real = real.reshape(3, 3)
         sns.heatmap(ax=ax[1], data=real, linewidths=0.5, vmin=500, vmax=10000)
         ax[1].set_title('Real')
         plt.show()
-
-# test_fakevsreal()
 
 def plot_choropleth(data):
     year = '2018'
@@ -51,10 +44,7 @@ def plot_choropleth(data):
         legend_name=year + '25.050, 121.520',
         reset=True).add_to(fmap)
     folium.LayerControl().add_to(fmap)
-
     item_txt = """<br><i style="color:{col}"></i>"""
-    # html_itms = item_txt.format(item="mark_1", col="red")
-
     legend_html = """
          <div style="
          position: fixed;
@@ -74,17 +64,11 @@ def plot_choropleth(data):
     file_path = 'C:/Users/Linda/Desktop/Master/model/Code/People_GAN_pycharm.html'
     fmap.save(file_path)
 
-# plot_choropleth(data)
-
-
-# # ----------- 3sigma -----------
-
 def sigma(data, n):
     data = data.POPULATION.tolist()
 
     ymean = np.mean(data)  
     ystd = np.std(data)  
-    # down = ymean - n * ystd  
     up = ymean + n * ystd
     outlier = []  
     index_list = []
@@ -102,7 +86,6 @@ def sigma_create_data(n, lon, lat):
     if not os.path.exists(f'./{location}/{n}sig'):
         os.makedirs(f'./{location}/{n}sig')
     train_threshold = pd.DataFrame()
-    # run -----------
     delta = 0.005
     right = str('%.03f' % (lon + delta))
     left = str('%.03f' % (lon - delta))
@@ -148,15 +131,6 @@ def sigma_create_data(n, lon, lat):
 
 
 def save_z_last():
-    gr1_csv = pd.read_csv('./zhongsan_3sig/zhongsan1_3sig.csv')
-    gr2_csv = pd.read_csv('./zhongsan_3sig/zhongsan2_3sig.csv')
-    gr3_csv = pd.read_csv('./zhongsan_3sig/zhongsan3_3sig.csv')
-    gr4_csv = pd.read_csv('./zhongsan_3sig/zhongsan4_3sig.csv')
-    gr5_csv = pd.read_csv('./zhongsan_3sig/zhongsan5_3sig.csv')
-    gr6_csv = pd.read_csv('./zhongsan_3sig/zhongsan6_3sig.csv')
-    gr7_csv = pd.read_csv('./zhongsan_3sig/zhongsan7_3sig.csv')
-    gr8_csv = pd.read_csv('./zhongsan_3sig/zhongsan8_3sig.csv')
-    gr9_csv = pd.read_csv('./zhongsan_3sig/zhongsan9_3sig.csv')
     gr1 = gr1_csv.POPULATION
     gr2 = gr2_csv.POPULATION
     gr3 = gr3_csv.POPULATION
@@ -166,7 +140,6 @@ def save_z_last():
     gr7 = gr7_csv.POPULATION
     gr8 = gr8_csv.POPULATION
     gr9 = gr9_csv.POPULATION
-
     z = np.zeros((8760, 3, 3))
     for hr in range(8760):
         z[hr][0][0] = gr1[hr]
@@ -180,12 +153,8 @@ def save_z_last():
         z[hr][2][2] = gr9[hr]
     print(z)
 
-    np.save('save_z_zhongsan_3sig.npy', z)
-
-
 
 def find_latlon():
-    # 找該點位是屬於人流資料中哪個網格
     lat_delta = 0.005 / 2
     lon_delta = 0.005 / 2
     latlon = list(df.columns.values)
@@ -206,13 +175,11 @@ def find_latlon():
             lat_bol = lat_711 in zoom_lat
             if lon_bol == True and lat_bol == True:
                 print(i)
-# find_latlon()
 
 
 def test_data_2019():
     df2019 = pd.read_csv('./test_2019.csv')
     print(df2019)
-
     col_grid = df2019.columns
     col_grid = col_grid.drop('Time')
     for col in col_grid:
@@ -222,10 +189,7 @@ def test_data_2019():
         grid_data['POPULATION'] = df2019[col]
         print(grid_data.isnull().any().sum())
         print(grid_data.isna().any().sum())
-        grid_data.to_csv('./grid_data_test/' + col + '.csv', index=False, encoding='utf-8-sig')
 
-
-# test_data_2019()
 
 def save_z(lon, lat, ty):
     delta = 0.005
@@ -254,8 +218,6 @@ def save_z(lon, lat, ty):
             index_1 += 1
     np.save(f'./{location}/save_z_{ty}.npy', z)
 
-
-# -----------test target-------------
 
 def test_target(n, lon, lat):
     if not os.path.exists(f'./{location}/train_target/{n}sig'):
@@ -335,16 +297,6 @@ def test_real():
     location_list = ['left_top', 'top', 'right_top', 'left', 'center', 'right', 'left_down', 'down', 'right_down']
     loc_grid_list = [left_top, top, right_top, left_center, center, right_center, left_down, down, right_down]
 
-    test1 = pd.read_csv(f'./grid_data_test/{str(left_top)}.csv')
-    test2 = pd.read_csv(f'./grid_data_test/{str(top)}.csv')
-    test3 = pd.read_csv(f'./grid_data_test/{str(right_top)}.csv')
-    test4 = pd.read_csv(f'./grid_data_test/{str(left_center)}.csv')
-    test5 = pd.read_csv(f'./grid_data_test/{str(center)}.csv')
-    test6 = pd.read_csv(f'./grid_data_test/{str(right_center)}.csv')
-    test7 = pd.read_csv(f'./grid_data_test/{str(left_down)}.csv')
-    test8 = pd.read_csv(f'./grid_data_test/{str(down)}.csv')
-    test9 = pd.read_csv(f'./grid_data_test/{str(right_down)}.csv')
-
     real_data = pd.DataFrame()
     real_data['grid1_real'] = test1.POPULATION
     real_data['grid2_real'] = test2.POPULATION
@@ -361,13 +313,12 @@ def test_real():
                   real_data.at[i, 'grid4_real'] + real_data.at[i, 'grid5_real'] + real_data.at[i, 'grid6_real'] + \
                   real_data.at[i, 'grid7_real'] + real_data.at[i, 'grid8_real'] + real_data.at[i, 'grid9_real']
         real_data.at[i, 'Mean'] = pop_sum / 9
-    real_data.to_csv('./ZhongShan/real_data.csv', index=False, encoding='utf-8-sig')
 
 
 def main():
     lon, lat = 121.565, 25.035  # Taipei101
 
-    for n in [1.5, 2, 3]:  # 1.5, 2, 2.5, 3, 3.5
+    for n in [1.5, 2, 3]:
         sigma_create_data(n, lon, lat)
         save_z(lon, lat, 'train')  # 8760*3*3
         save_z(lon, lat, 'test')
