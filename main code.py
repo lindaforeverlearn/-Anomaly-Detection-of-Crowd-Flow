@@ -46,11 +46,11 @@ colormap = pyplot.cm.coolwarm_r
 location = 'Taipei101'
 lon, lat = 121.565, 25.035  # Taipei101
 latent_dim = 100
-batchsize = 30  # 30
-epoch = 60  # 60 30
+batchsize = 30  
+epoch = 60  
 look_back = 3
-long = 1  # 前幾小時    1~6
-version = 10  # 10
+long = 1  # 前幾小時
+version = 10  
 len_pre = 8760 - look_back - long + 1
 
 
@@ -112,16 +112,15 @@ def P_train(BATCH_SIZE, v, n):
 
     g.compile(loss='mse', optimizer='adam')  # adam
     g_d_optim = RMSprop(lr=0.001, clipvalue=1.0, decay=1e-8)
-    d_on_g.compile(loss='binary_crossentropy', optimizer=g_d_optim)  # binary_crossentropy
+    d_on_g.compile(loss='binary_crossentropy', optimizer=g_d_optim)
     d.trainable = True
     d_optim = RMSprop(lr=0.001, clipvalue=1.0, decay=1e-8)
-    d.compile(loss='binary_crossentropy', optimizer=d_optim)  # binary_crossentropy
+    d.compile(loss='binary_crossentropy', optimizer=d_optim)  
 
     losses = []
     rmse = []
 
     for ee in range(epoch):  # 30  100
-        # print("Epoch is　：", epoch)
 
         for index in range(int(X_train.shape[0] / BATCH_SIZE)):
             noise = np.random.uniform(-1, 1, size=(BATCH_SIZE, latent_dim))
@@ -132,15 +131,10 @@ def P_train(BATCH_SIZE, v, n):
             y = np.asarray(y).astype('float32').reshape((-1, 1))
 
             d_loss = d.train_on_batch(X, y)
-            # G固定
-            # g_loss = d_on_g.train_on_batch(noise, np.asarray([1] * BATCH_SIZE).astype('float32').reshape((-1, 1)))
-
-            # print("batch %d  d_loss : %f" % (index, d_loss))
             noise = np.random.uniform(-1, 1, (BATCH_SIZE, latent_dim))
             d.trainable = False
             g_loss = d_on_g.train_on_batch(noise, np.asarray([1] * BATCH_SIZE).astype('float32').reshape((-1, 1)))
             d.trainable = True
-            # print("batch %d  g_loss : %f" % (index, g_loss))
 
             if index == int(X_train.shape[0] / BATCH_SIZE) - 1:
                 fake = combine_images(generated_images)
@@ -169,7 +163,6 @@ def P_train(BATCH_SIZE, v, n):
                 fake = fake.reshape(3, 3, 1)
                 real = real.reshape(3, 3, 1)
 
-                ###########################################################################
                 g.save_weights(f'./{location}/{n}sig/model/g_P_v{str(v)}.h5')
                 d.save_weights(f'./{location}/{n}sig/model/d_P_v{str(v)}.h5')
                 fake = fake.reshape(1, 3, 3, 1)
