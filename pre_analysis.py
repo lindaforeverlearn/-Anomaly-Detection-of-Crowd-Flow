@@ -130,32 +130,13 @@ def create_dataset(temp):
         y_end = i + look_back + long - 1
         if y_end > len(temp) - 1:
             break
-        # i = i + long
-        # print(i, end)
         temp_x, temp_y = temp[i:x_end, :, :], temp[y_end]
         # print(temp_x.shape)
         temp_x = temp_x.reshape(3, 3, 3)
-        # print(temp_x)
-        # print(temp_y)
-        # print(temp_x.shape)
+
         X.append(temp_x)
         y.append(temp_y)
-        # print(temp_x.shape, temp_y.shape)
 
-    # print(len(X), len(y))
-    # # long = long + 1  # 前long小時預測
-    # for i in range(len(temp)):  # len(train)
-    #     end = i + look_back  # + long
-    #     if end > len(temp) - 1:
-    #         break
-    #     # i = i + long
-    #     # print(i, end)
-    #     temp_x, temp_y = temp[i:end, :, :], temp[end]
-    #     # print(temp_x.shape)
-    #
-    #     temp_x = temp_x.reshape(3, 3, 3)
-    #     X.append(temp_x)
-    #     y.append(temp_y)
     return array(X), array(y)
 
 
@@ -178,8 +159,6 @@ def create_timestamp_X_Y_cnn(data_2018, data_2019):
     train, test = nor(data_2018, data_2019)
     train_X, train_y = create_dataset(train)
     test_X, test_y = create_dataset(test)
-    # print(train_X, train_y)
-    # print(test_X, test_)
 
     return train_X, train_y, test_X, test_y
 
@@ -201,9 +180,6 @@ def cnn_predict():
     time_len = 8760 - look_back - long + 1
     z = np.zeros((time_len, 3, 3))
     for hr in range(time_len):
-        # print(hr)
-        # print(pre[hr][0][0][0])
-        # print(gr1)
         gr1.append(pre[hr][0][0][0])
         gr2.append(pre[hr][0][1][0])
         gr3.append(pre[hr][0][2][0])
@@ -217,23 +193,10 @@ def cnn_predict():
     return pre, gr1, gr2, gr3, gr4, gr5, gr6, gr7, gr8, gr9
 
 
-location = 'Chungsiou'
+location = 'Taipei101'
 sig_n = 2
-long = 1
-# location = 'Taipei101'
-# sig_n = 2
-# long = 2
-# location = 'Shilin'
-# sig_n = 3
-# long = 1
-
+long = 2
 look_back = 3
-# --test----
-# pre = 1
-# test = 1
-# cnn_predict()
-# pre_one_time_9grid(location, sig_n, long, pre, test)
-
 
 def run_pre_one_time_9grid():
     for p in range(0, 2):
@@ -307,19 +270,3 @@ def pre_all_time_9grid(location, sig_n, long, pre, test):
             width=1200,
             height=800)
         fig.show()
-        # grid2_pop = analysis_data.at[time_index_0, 'top']
-        # grid3_pop = analysis_data.at[time_index_0, 'right_top']
-        # grid4_pop = analysis_data.at[time_index_0, 'left']
-        # grid5_pop = analysis_data.at[time_index_0, 'center']
-        # grid6_pop = analysis_data.at[time_index_0, 'right']
-        # grid7_pop = analysis_data.at[time_index_0, 'left_down']
-        # grid8_pop = analysis_data.at[time_index_0, 'down']
-        # grid9_pop = analysis_data.at[time_index_0, 'right_down']
-
-
-# location = 'Taipei101'
-# lon, lat = 121.565, 25.035  # Taipei101
-# location = 'Shilin'
-# lon, lat = 121.520, 25.090  # Shilin
-# location = 'Chungsiou'
-# lon, lat = 121.550, 25.040  # Chungsiou
